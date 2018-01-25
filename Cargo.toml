@@ -5,7 +5,6 @@ authors = ["UninterestinAcc <uninterestinacc@users.noreply.github.com>"]
 
 [dependencies]
 reqwest="0.8"
-lazy_static="*"
 log="*"
 serde="*"
 serde_derive="*"
