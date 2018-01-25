@@ -45,4 +45,4 @@ convertible_error!(CacheError: RefreshError);
 convertible_error!(RefreshError: FetchError, FindError);
 convertible_error!(FetchError: ReqwestErr, SerdeJsonErr);
 convertible_error!(FindError: ReqwestErr, SerdeJsonErr);
-
+convertible_error!(InitError: FetchError);
