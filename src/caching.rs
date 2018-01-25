@@ -45,6 +45,7 @@ impl<T: Refresh> Cached<T> {
 	/// Safely dereference this pointer, taking into account the age for automatic updates
 	pub fn checked_deref<'a>(&'a mut self) -> Result<&'a T, CacheError> {
 		if self.has_timed_out() {
+			debug!("Detected cache timeout, refreshing... (Age past timeout: {})", -self.ttl());
 			self.inner = self.refresh()?;
 		}
 		Ok(&self.inner)
