@@ -1,21 +1,31 @@
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
-extern crate serde_derive;
+extern crate log;
+extern crate reqwest;
 extern crate serde;
+extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 
-pub mod cached;
-pub use cached::Cached;
-
+pub mod caching;
 pub mod error;
-
+pub mod retrieve;
 pub mod stats;
+
+pub use caching::*;
 use stats::GlobalStats;
 
 use std::collections::HashMap;
 use std::sync::Mutex;
 
 pub struct Coin;
+
+impl Refresh for Coin {
+	fn refresh(&self) -> Result<Self, RefreshError> {
+		Err(RefreshError::from_str("Unimplemented!"))
+	}
+}
 
 lazy_static! {
 	static ref GLOBAL_STATS: Mutex<Option<Cached<GlobalStats>>> = Mutex::new(None);
