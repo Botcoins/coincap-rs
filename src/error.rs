@@ -29,7 +29,7 @@ macro_rules! str_err {
 	}
 }
 
-macro_rules! retrieve_err {
+macro_rules! convertible_error {
 	($ty:ident: $($from_ty:ident),*) => {
 		str_err!($ty);
 
@@ -41,9 +41,8 @@ macro_rules! retrieve_err {
 	}
 }
 
-str_err!(CacheError);
-str_err!(RefreshError);
-
-retrieve_err!(FetchError: ReqwestErr, SerdeJsonErr);
-retrieve_err!(FindError: ReqwestErr, SerdeJsonErr);
+convertible_error!(CacheError: RefreshError);
+convertible_error!(RefreshError: FetchError, FindError);
+convertible_error!(FetchError: ReqwestErr, SerdeJsonErr);
+convertible_error!(FindError: ReqwestErr, SerdeJsonErr);
 

@@ -2,8 +2,6 @@ use caching::Refresh;
 pub use error::{FetchError, RefreshError};
 use retrieve::Fetch;
 
-use std::error::Error;
-
 use reqwest;
 use serde_json;
 
@@ -18,7 +16,7 @@ pub struct GlobalStats {
 	/// USD price bitcoin
 	#[serde(rename = "btcPrice")] pub btc_price: f64,
 	/// USD Market cap of bitcoin
-	#[serde(rename = "btcCap")] pub btc_mkt_cap: f64,
+	#[serde(rename = "btcCap")] pub btc_cap: f64,
 	/// Percentage market dominance of bitcoin
 	#[serde(rename = "dom")] pub btc_dom: f64,
 	/// Volume of bitcoin transactions / trades, in USD
@@ -31,10 +29,7 @@ pub struct GlobalStats {
 
 impl Refresh for GlobalStats {
 	fn refresh(&self) -> Result<Self, RefreshError> {
-		match Self::fetch() {
-			Ok(inner) => Ok(inner),
-			Err(err) => Err(RefreshError(format!("FetchError: {}", err.description())))
-		}
+		Ok(Self::fetch()?)
 	}
 }
 
@@ -47,5 +42,26 @@ impl Fetch for GlobalStats {
 		} else {
 			Err(FetchError(format!("Request failed with HTTP error code {}", resp.status().to_string())))
 		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	macro_rules! try_panic {
+		($ex:expr) => {
+			match $ex {
+				Ok(inner) => inner,
+				Err(err) => panic!("{:?}", err)
+			}
+		}
+	}
+
+	#[test]
+	fn test() {
+		let stats = try_panic! {GlobalStats::fetch()};
+
+		assert!((stats.alts_cap + stats.btc_cap - stats.total_cap).abs() < 1.); // Checks the absolute difference between components and total is less than 1
 	}
 }

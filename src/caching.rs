@@ -43,14 +43,11 @@ impl<T> Cached<T> {
 
 impl<T: Refresh> Cached<T> {
 	/// Safely dereference this pointer, taking into account the age for automatic updates
-	pub fn checked_deref<'a>(&'a mut self) -> &'a T {
+	pub fn checked_deref<'a>(&'a mut self) -> Result<&'a T, CacheError> {
 		if self.has_timed_out() {
-			match self.refresh() {
-				Ok(inner) => self.inner = inner,
-				Err(err) => error!("Refresh error: {:?}", err)
-			}
+			self.inner = self.refresh()?;
 		}
-		&self.inner
+		Ok(&self.inner)
 	}
 }
 
@@ -80,7 +77,7 @@ mod tests {
 	fn refreshed_deref() {
 		let mut ch = Cached::new(MockObj(0), 1);
 		sleep(Duration::from_secs(2));
-		assert_eq!(ch.checked_deref().0, 1);
+		assert_eq!(ch.checked_deref().unwrap().0, 1);
 	}
 
 	#[test]
